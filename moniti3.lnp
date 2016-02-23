@@ -1,0 +1,5 @@
+"STARTUP.obj",
+"ds1302.obj",
+"iic.obj",
+"main.obj" 
+TO "moniti3" 

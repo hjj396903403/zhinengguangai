@@ -1,0 +1,110 @@
+C51 COMPILER V9.00   DS1302                                                                12/07/2013 20:36:14 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE DS1302
+OBJECT MODULE PLACED IN ds1302.OBJ
+COMPILER INVOKED BY: e:\Keil\C51\BIN\C51.EXE ds1302.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include"ds1302.h"
+   2          #include<intrins.h>
+   3          uchar write_add[];
+   4          uchar read_add[];
+   5          uchar time_data[];
+   6          void write_one(uchar dat)
+   7          {
+   8   1              uchar i;
+   9   1              for(i=0;i<8;i++)
+  10   1              {
+  11   2                      sclk=0;
+  12   2                      io=dat&0x01;
+  13   2                      dat=dat>>1;
+  14   2                      sclk=1; 
+  15   2              }
+  16   1      }
+  17          uchar read_one(uchar add)
+  18          {
+  19   1              uchar dat;
+  20   1              uchar i;
+  21   1              sclk=0;
+  22   1              _nop_();
+  23   1              rst=0;
+  24   1              _nop_();
+  25   1              rst=1;
+  26   1              _nop_();
+  27   1              write_one(add);
+  28   1              for(i=0;i<8;i++)
+  29   1              {
+  30   2                      sclk=1;
+  31   2                      _nop_();
+  32   2                      dat=dat>>1;     
+  33   2                      sclk=0;
+  34   2                      _nop_();
+  35   2                      if(io)
+  36   2                      {
+  37   3                              dat=dat|0x80;
+  38   3                      }               
+  39   2                      
+  40   2              }
+  41   1              rst=0;
+  42   1              _nop_();
+  43   1              io=0;
+  44   1              _nop_();
+  45   1              return dat;
+  46   1      }
+  47          void write_ds1302(uchar add,uchar dat)
+  48          {
+  49   1              sclk=0;
+  50   1              _nop_();
+  51   1              rst=0;
+  52   1              _nop_();
+  53   1              rst=1;
+  54   1              _nop_();
+  55   1              write_one(add);
+C51 COMPILER V9.00   DS1302                                                                12/07/2013 20:36:14 PAGE 2   
+
+  56   1              write_one(dat);
+  57   1              rst=0;
+  58   1              _nop_();
+  59   1              sclk=1;
+  60   1              _nop_();
+  61   1      }
+  62          void set_time()
+  63          {
+  64   1              uchar i,j;
+  65   1              for(i=0;i<7;i++)
+  66   1              {
+  67   2                      j=time_data[i]/10;
+  68   2                      time_data[i]=time_data[i]%10;
+  69   2                      time_data[i]=time_data[i]+j*16;
+  70   2              }
+  71   1              write_ds1302(0x8e,0x00);
+  72   1              for(i=0;i<7;i++)
+  73   1              {
+  74   2                      write_ds1302(write_add[i],time_data[i]);
+  75   2              }
+  76   1              write_ds1302(0x8e,0x80);
+  77   1      }
+  78          void read_time()
+  79          {
+  80   1              uchar i;
+  81   1              for(i=0;i<8;i++)
+  82   1              {
+  83   2                      time_data[i]=read_one(read_add[i]);
+  84   2              }
+  85   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    179    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

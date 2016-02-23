@@ -1,0 +1,142 @@
+C51 COMPILER V9.00   IIC                                                                   12/07/2013 20:36:15 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE IIC
+OBJECT MODULE PLACED IN iic.OBJ
+COMPILER INVOKED BY: e:\Keil\C51\BIN\C51.EXE iic.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include"iic.h"
+   2          #include<intrins.h>
+   3          void delay()
+   4          {
+   5   1              _nop_();        _nop_();        _nop_();        _nop_();        _nop_();        _nop_();        _nop_();
+   6   1      }
+   7          void init()
+   8          {
+   9   1              sda=1;
+  10   1              scl=1;
+  11   1      }
+  12          void start()
+  13          {
+  14   1              sda=1;
+  15   1              delay();
+  16   1              scl=1;
+  17   1              delay();
+  18   1              sda=0;
+  19   1              delay();
+  20   1              scl=0;
+  21   1              delay();
+  22   1      
+  23   1      
+  24   1      }
+  25          void stop()
+  26          {
+  27   1              sda=0;
+  28   1              delay();
+  29   1              scl=1;
+  30   1              delay();
+  31   1              sda=1;
+  32   1              delay();
+  33   1      }
+  34          void ack()
+  35          {
+  36   1              uchar i;
+  37   1              scl=1;
+  38   1              delay();
+  39   1              while((sda=1)&&(i<200))i++;
+  40   1              scl=0;
+  41   1              delay();
+  42   1      }
+  43          void noack()
+  44          {
+  45   1              scl=1;
+  46   1              delay();
+  47   1              sda=1;
+  48   1              delay();
+  49   1              scl=0;
+  50   1              delay();
+  51   1      }
+  52          void write_byte(uchar dat)
+  53          {
+  54   1              uchar i;
+  55   1              for(i=0;i<8;i++)
+C51 COMPILER V9.00   IIC                                                                   12/07/2013 20:36:15 PAGE 2   
+
+  56   1              {
+  57   2                      scl=0;
+  58   2                      delay();
+  59   2                      sda=dat&0x80;
+  60   2                      dat=dat<<1;
+  61   2                      scl=1;
+  62   2                      delay();
+  63   2                      scl=0;
+  64   2                      delay();
+  65   2              }
+  66   1              sda=1;
+  67   1              delay();
+  68   1      }
+  69          uchar read_byte()
+  70          {
+  71   1              uchar dat,k;
+  72   1               uchar i;
+  73   1               for(i=0;i<8;i++)
+  74   1               {
+  75   2                      scl=1;
+  76   2                      delay();
+  77   2                      dat=sda;
+  78   2                      k=(k<<1)|dat;
+  79   2                      scl=0;
+  80   2                      delay();
+  81   2               }
+  82   1               return k;
+  83   1      }
+  84          void write_iic(uchar add,uchar byte_add,uchar dat)
+  85          {
+  86   1              start();
+  87   1              write_byte(add);
+  88   1              ack();
+  89   1              write_byte(byte_add);
+  90   1              ack();
+  91   1              write_byte(dat);
+  92   1              noack();
+  93   1              stop();
+  94   1      }
+  95          uchar  read_adc()
+  96          {
+  97   1              uchar dat;
+  98   1              start();
+  99   1              write_byte(0x91);
+ 100   1              ack();
+ 101   1              dat=read_byte();
+ 102   1              noack();
+ 103   1              stop();
+ 104   1              return dat;
+ 105   1      }
+ 106          void channel()
+ 107          {       
+ 108   1              start();
+ 109   1              write_byte(0x90);
+ 110   1              ack();
+ 111   1              write_byte(0x40);
+ 112   1              noack();
+ 113   1              stop();
+ 114   1      
+ 115   1      }
+
+
+C51 COMPILER V9.00   IIC                                                                   12/07/2013 20:36:15 PAGE 3   
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    220    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       1
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
